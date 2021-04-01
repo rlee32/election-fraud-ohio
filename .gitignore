@@ -1,2 +1,3 @@
 *.pyc
 voter_database/*.csv
+*.swp
