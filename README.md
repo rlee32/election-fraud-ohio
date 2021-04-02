@@ -8,9 +8,9 @@ Requires python3 and curl. Before running, be sure you have enough free space fo
 
 ## Running
 
-1. Download voter registration database (may take a while): ./download_voter_database.py
-2. Convert raw csv data to json (also may take a while): ./jsonify.py
-3. Finally, plot voter turnout lines vs. age for all counties on the same plot: ./plot_turnout_by_age.py
+1. Download voter registration database (may take a while): `./download_voter_database.py`
+2. Convert raw csv data to json (also may take a while): `./jsonify.py`
+3. Finally, plot voter turnout lines vs. age for all counties on the same plot: `./plot_turnout_by_age.py`
 
 ## Data source
 
