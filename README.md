@@ -1,4 +1,4 @@
-# Voting Machine Fraud in the state of Ohio
+# Voting Machine Fraud in the State of Ohio
 
 This exposes the pattern between voter turnout and age that proves voting machine fraud in Ohio was used in the 2020 General Presidential Election.
 
