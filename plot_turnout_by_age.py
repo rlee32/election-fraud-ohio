@@ -61,8 +61,8 @@ if __name__ == '__main__':
         except:
             print(f'could not plot county_id {county_id}')
     print(f'plotted {counties_plotted} counties.')
-    plt.xlabel('age')
-    plt.ylabel('ratio of votes to registered voters')
+    plt.xlabel('Age')
+    plt.ylabel('Voter turnout (votes / registered voters)')
     plt.title(f'Ohio Voter Turnout vs. Age ({counties_plotted} counties; each line = 1 county)')
     plt.show()
 
