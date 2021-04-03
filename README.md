@@ -4,7 +4,7 @@ This exposes the pattern between voter turnout and age that proves voting machin
 
 ## Results
 
-![alt text] (plots/2020.png)
+![alt text](plots/2020.png)
 
 ## Setup
 
