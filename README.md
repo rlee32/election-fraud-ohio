@@ -6,14 +6,14 @@ This exposes the pattern between voter turnout and age that proves voting machin
 
 The following plots show how accurate predictions of votes cast can be, given just registrations and overall turnout, in 8 of the 10 largest counties in Ohio.
 
+![alt text](plots/2020_predict_57.png)
+![alt text](plots/2020_predict_76.png)
 ![alt text](plots/2020_predict_25.png)
 ![alt text](plots/2020_predict_18.png)
 ![alt text](plots/2020_predict_31.png)
+
 ![alt text](plots/2020_predict_47.png)
 ![alt text](plots/2020_predict_48.png)
-
-![alt text](plots/2020_predict_57.png)
-![alt text](plots/2020_predict_76.png)
 ![alt text](plots/2020_predict_83.png)
 
 Note that the following normalized voter turnout plots were generated with the 2020 voter roll for all years.
