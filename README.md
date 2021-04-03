@@ -2,6 +2,10 @@
 
 This exposes the pattern between voter turnout and age that proves voting machine fraud in Ohio was used in the 2020 General Presidential Election.
 
+## Results
+
+![alt text] (plots/2020.png)
+
 ## Setup
 
 Requires python3 and curl. Before running, be sure you have enough free space for the downloaded CSV files and converted JSON files. Should be on the order of 1 GB for all 88 counties in Ohio.
