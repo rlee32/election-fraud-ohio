@@ -33,18 +33,24 @@ def convert_csv(filepath):
         voter_status_index = header.index('VOTER_STATUS')
         general_2016_index = header.index('GENERAL-11/08/2016')
         general_2020_index = header.index('GENERAL-11/03/2020')
+        general_2000_index = header.index('GENERAL-11/07/2000')
+        general_2004_index = header.index('GENERAL-11/02/2004')
+        general_2008_index = header.index('GENERAL-11/04/2008')
+        general_2012_index = header.index('GENERAL-11/06/2012')
 
         statuses = {}
         for row in csv_reader:
             voter_status = row[voter_status_index]
-            general_2016 = row[general_2016_index]
-            general_2020 = row[general_2020_index]
             new_items.append({
                 'date_of_birth': row[date_of_birth_index],
                 'registration_date': row[registration_date_index],
                 'voter_status': voter_status,
-                'general_2016': general_2016,
-                'general_2020': general_2020
+                'general_2000': row[general_2000_index],
+                'general_2016': row[general_2016_index],
+                'general_2020': row[general_2020_index],
+                'general_2004': row[general_2004_index],
+                'general_2008': row[general_2008_index],
+                'general_2012': row[general_2012_index],
             })
             if voter_status not in statuses:
                 statuses[voter_status] = 0
