@@ -15,4 +15,4 @@ if __name__ == '__main__':
     os.system(f'mkdir -p {VOTER_DATABASE_FOLDER}')
     for i in range(total_counties):
         get_county(i + 1)
-        print(f'downloaded {i + 1} / {total_counties} files.')
+        print(f'\ndownloaded {i + 1} / {total_counties} files.\n')
