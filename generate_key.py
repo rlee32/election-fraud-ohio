@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-# aggregates voters by age.
+# looks at all available counties and computes a conversion key that can be used to predict actual turnout from registrations.
+
+OUTPUT_FILE = './key.json'
 
 def str_to_int(date):
     """Converts date in form YYYY-MM-DD to and integer of form YYYYMMDD. """
@@ -17,7 +19,6 @@ def get_age(start_date, end_date):
         return int(diff / 10000)
 
 from jsonify import OUTPUT_FOLDER as JSON_FOLDER
-TOTAL_COUNTIES = 88
 import json
 
 ELECTION_YEAR = 2020 # choose presidential election years from 2000 - 2020
@@ -59,33 +60,11 @@ def votes_by_age(county_id: int):
 import sys
 import os
 
-from matplotlib import pyplot as plt
-
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        county_id = int(sys.argv[1])
-
-        by_age = votes_by_age(county_id)
-        sorted_by_age = list(by_age.items())
-        sorted_by_age.sort()
-        age = [x[0] for x in sorted_by_age]
-        voted = [by_age[x[0]]['voted'] for x in sorted_by_age]
-        registered = [by_age[x[0]]['registered'] for x in sorted_by_age]
-        plt.plot(age, voted)
-        plt.plot(age, registered)
-        plt.xlabel(f'Age')
-        plt.ylabel('Voters or votes')
-        plt.title(f'Ohio Voters or Votes vs. Age')
-        plt.show()
-
-        sys.exit()
-
     filenames = os.listdir(JSON_FOLDER)
-    MINIMUM_REGISTERED_VOTERS = 50 # per age group
     MINIMUM_TOTAL_VOTERS = None # per county
-    isolated_colors = None # plots these county ids in different colors from the rest
-    print(f'plotting age groups with minimum of {MINIMUM_REGISTERED_VOTERS} registered voters.')
-    counties_plotted = 0
+    counties_used = 0
+    turnouts = {} # maps age to a list of conversion key (normalized turnout) values.
     for f in filenames:
         if f[-5:] != '.json':
             continue
@@ -103,24 +82,25 @@ if __name__ == '__main__':
                 continue
             ii = range(len(registered))
             key = [voted[i] / registered[i] / overall_turnout for i in ii]
-            if isolated_colors:
-                if county_id in isolated_colors:
-                    plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], 'r')
-                else:
-                    plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], 'b')
-            else:
-                plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS])
-            counties_plotted += 1
-        except:
-            print(f'could not plot county_id {county_id}')
-    print(f'plotted {counties_plotted} counties.')
+            for i in ii:
+                a = age[i]
+                if a not in turnouts:
+                    turnouts[a] = []
+                turnouts[a].append(key[i])
+            counties_used += 1
+        except Exception as e:
+            print(f'could not use county_id {county_id}')
+            print(e)
+    print(f'used {counties_used} counties.')
+
     if MINIMUM_TOTAL_VOTERS is not None:
         print(f'skipped counties with less than {MINIMUM_TOTAL_VOTERS} voters.')
-    plt.xlabel(f'Age (ages with less than {MINIMUM_REGISTERED_VOTERS} registered voters are hidden)')
-    plt.ylabel('Normalized voter turnout (votes / registered voters / overall turnout fraction)')
-    plt.title(f'{ELECTION_YEAR} Ohio Voter Turnout vs. Age ({counties_plotted} of {TOTAL_COUNTIES} counties; each line = 1 county)')
 
-    plt.show()
+    # finally, write out key as json.
+    for age in turnouts:
+        counts = turnouts[age]
+        avg = sum(counts) / len(counts)
+        turnouts[age] = avg
 
-
-
+    json.dump(turnouts, open(OUTPUT_FILE, 'w'))
+    print(f'wrote key to {OUTPUT_FILE}')

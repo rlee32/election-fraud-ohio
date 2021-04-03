@@ -3,3 +3,4 @@ jsonified/*.json
 voter_database/*.csv
 *.swp
 ._*.*
+key.json
