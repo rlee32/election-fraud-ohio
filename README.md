@@ -27,7 +27,7 @@ Note that the following normalized voter turnout plots were generated with the 2
 
 ## Setup
 
-Requires python3 and curl. Before running, be sure you have enough free space for the downloaded CSV files and converted JSON files. Should be on the order of 1 GB for all 88 counties in Ohio.
+Requires python3 and curl. Before running, be sure you have enough free space for the downloaded CSV files and converted JSON files. Should be about 6 GB for all 88 counties in Ohio.
 
 ## Running: Voter Turnout Plots
 
