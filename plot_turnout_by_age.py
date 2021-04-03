@@ -18,10 +18,22 @@ def get_age(start_date, end_date):
 
 from jsonify import OUTPUT_FOLDER as JSON_FOLDER
 OUTPUT_FOLDER = './by_age/'
+TOTAL_COUNTIES = 88
 import json
 
-ELECTION_FIELD = 'general_2020'
-ELECTION_DATE = '2020-11-03'
+ELECTION_YEAR = 2020 # choose presidential election years from 2000 - 2020
+
+ELECTION_DAY = {
+    2020: '03',
+    2016: '08',
+    2012: '06',
+    2008: '04',
+    2004: '02',
+    2000: '07'
+}
+
+ELECTION_DATE = f'{ELECTION_YEAR}-11-{ELECTION_DAY[ELECTION_YEAR]}'
+ELECTION_FIELD = f'general_{ELECTION_YEAR}'
 
 def votes_by_age(county_id: int):
     """Reads voter data in json format and outputs votes aggregated by age for the specified election. """
@@ -32,6 +44,9 @@ def votes_by_age(county_id: int):
         if registration_age < 0:
             continue
         age = get_age(d['date_of_birth'], ELECTION_DATE)
+        if age < 18:
+            print(f'skipping underage {age}; data: {d}')
+            continue
         if age > 150:
             print(f'skipping unreasonable age {age}; data: {d}')
             continue
@@ -105,7 +120,7 @@ if __name__ == '__main__':
         print(f'skipped counties with less than {MINIMUM_TOTAL_VOTERS} voters.')
     plt.xlabel(f'Age (ages with less than {MINIMUM_REGISTERED_VOTERS} registered voters are hidden)')
     plt.ylabel('Normalized voter turnout (votes / registered voters / overall turnout fraction)')
-    plt.title(f'Ohio Voter Turnout vs. Age ({counties_plotted} of {len(filenames)} counties; each line = 1 county)')
+    plt.title(f'{ELECTION_YEAR} Ohio Voter Turnout vs. Age ({counties_plotted} of {TOTAL_COUNTIES} counties; each line = 1 county)')
 
     plt.show()
 
