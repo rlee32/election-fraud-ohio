@@ -4,7 +4,14 @@ This exposes the pattern between voter turnout and age that proves voting machin
 
 ## Results
 
+Note that these plots were generated with the 2020 voter roll.
+
 ![alt text](plots/2020.png)
+![alt text](plots/2016.png)
+![alt text](plots/2012.png)
+![alt text](plots/2008.png)
+![alt text](plots/2004.png)
+![alt text](plots/2000.png)
 
 ## Setup
 
