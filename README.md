@@ -17,4 +17,4 @@ Requires python3 and curl. Before running, be sure you have enough free space fo
 Links are hard-coded in the python code and may break if websites are changed.
 
 Ohio voter registration database: https://www6.ohiosos.gov/ords/f?p=VOTERFTP:HOME:::#cntyVtrFiles
-
+Ohio county codes / IDs: https://jfs.ohio.gov/performancecenter/fastfacts/ohio_counties_with_county_codes.pdf
