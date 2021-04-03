@@ -19,40 +19,38 @@ def print_header(filepath):
             print(col, i)
             i += 1
 
-# column indices
-DATE_OF_BIRTH = 7
-REGISTRATION_DATE = 8
-VOTER_STATUS = 9
-GENERAL_2020 = 109 # voting record for General Presidential Election 2020. blank means no vote.
-
 def convert_csv(filepath):
     with open(filepath, 'r') as f:
         csv_reader = csv.reader(f)
-        line_count = 0
         new_items = []
         for row in csv_reader:
             header = row
             break
+
+        # determine column indices.
+        date_of_birth_index = header.index('DATE_OF_BIRTH')
+        registration_date_index = header.index('REGISTRATION_DATE')
+        voter_status_index = header.index('VOTER_STATUS')
+        general_2016_index = header.index('GENERAL-11/08/2016')
+        general_2020_index = header.index('GENERAL-11/03/2020')
+
         statuses = {}
-        votes = {}
         for row in csv_reader:
-            voter_status = row[VOTER_STATUS]
-            general_2020 = row[GENERAL_2020]
+            voter_status = row[voter_status_index]
+            general_2016 = row[general_2016_index]
+            general_2020 = row[general_2020_index]
             new_items.append({
-                'date_of_birth': row[DATE_OF_BIRTH],
-                'registration_date': row[REGISTRATION_DATE],
+                'date_of_birth': row[date_of_birth_index],
+                'registration_date': row[registration_date_index],
                 'voter_status': voter_status,
+                'general_2016': general_2016,
                 'general_2020': general_2020
             })
             if voter_status not in statuses:
                 statuses[voter_status] = 0
-            if general_2020 not in votes:
-                votes[general_2020] = 0
             statuses[voter_status] += 1
-            votes[general_2020] += 1
 
         print(f'voter statuses: {statuses}')
-        print(f'vote types: {votes}')
         return new_items
 
 import sys
@@ -63,6 +61,7 @@ if __name__ == '__main__':
     os.system(f'mkdir -p {OUTPUT_FOLDER}')
     filenames = os.listdir(VOTER_DATABASE_FOLDER)
     already_output = set(os.listdir(OUTPUT_FOLDER))
+    failures = 0
     for f in filenames:
         if f in already_output:
             print(f'skipping {f}; already in {OUTPUT_FOLDER}')
@@ -79,5 +78,6 @@ if __name__ == '__main__':
             json.dump(new_items, open(f'{OUTPUT_FOLDER}/{county_id}.json', 'w'), indent=2)
         except:
             print(f'\n\ncould not jsonify county_id {county_id}\n\n')
-
+            failures += 1
+    print(f'failed to jsonify {failures} counties.')
 
