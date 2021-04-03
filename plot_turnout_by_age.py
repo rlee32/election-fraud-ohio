@@ -20,22 +20,27 @@ from jsonify import OUTPUT_FOLDER as JSON_FOLDER
 OUTPUT_FOLDER = './by_age/'
 import json
 
-def general_2020_by_age(county_id: int):
-    """Reads voter data in json format and outputs votes aggregated by age for the 2020 general election. """
+ELECTION_FIELD = 'general_2020'
+ELECTION_DATE = '2020-11-03'
+
+def votes_by_age(county_id: int):
+    """Reads voter data in json format and outputs votes aggregated by age for the specified election. """
     data = json.load(open(f'{JSON_FOLDER}/{county_id}.json', 'r'))
     by_age = {}
     for d in data:
-        registration_age = get_age(d['registration_date'], '2020-11-03')
+        registration_age = get_age(d['registration_date'], ELECTION_DATE)
         if registration_age < 0:
             continue
-        age = get_age(d['date_of_birth'], '2020-11-03')
+        age = get_age(d['date_of_birth'], ELECTION_DATE)
+        if age > 150:
+            print(f'skipping unreasonable age {age}; data: {d}')
+            continue
         if age not in by_age:
             by_age[age] = {'registered': 0, 'voted': 0}
         by_age[age]['registered'] += 1
-        if d['general_2020'].strip():
+        if d[ELECTION_FIELD].strip():
             by_age[age]['voted'] += 1
     return by_age
-
 
 OUTPUT_FOLDER = './voters_by_age/'
 import sys
@@ -44,8 +49,28 @@ import os
 from matplotlib import pyplot as plt
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        county_id = int(sys.argv[1])
+
+        by_age = votes_by_age(county_id)
+        sorted_by_age = list(by_age.items())
+        sorted_by_age.sort()
+        age = [x[0] for x in sorted_by_age]
+        voted = [by_age[x[0]]['voted'] for x in sorted_by_age]
+        registered = [by_age[x[0]]['registered'] for x in sorted_by_age]
+        plt.plot(age, voted)
+        plt.plot(age, registered)
+        plt.xlabel(f'Age')
+        plt.ylabel('Voters or votes')
+        plt.title(f'Ohio Voters or Votes vs. Age')
+        plt.show()
+
+        sys.exit()
+
     filenames = os.listdir(JSON_FOLDER)
-    MINIMUM_REGISTERED_VOTERS = 50
+    MINIMUM_REGISTERED_VOTERS = 50 # per age group
+    MINIMUM_TOTAL_VOTERS = None # per county
+    isolated_colors = None # plots these county ids in different colors from the rest
     print(f'plotting age groups with minimum of {MINIMUM_REGISTERED_VOTERS} registered voters.')
     counties_plotted = 0
     for f in filenames:
@@ -53,17 +78,35 @@ if __name__ == '__main__':
             continue
         try:
             county_id = int(f.split('.')[0])
-            by_age = general_2020_by_age(county_id)
+            by_age = votes_by_age(county_id)
             sorted_by_age = list(by_age.items())
             sorted_by_age.sort()
-            plt.plot([x[0] for x in sorted_by_age if by_age[x[0]]['registered'] > MINIMUM_REGISTERED_VOTERS], [by_age[x[0]]['voted'] / by_age[x[0]]['registered'] for x in sorted_by_age if by_age[x[0]]['registered'] > MINIMUM_REGISTERED_VOTERS])
+            age = [x[0] for x in sorted_by_age]
+            voted = [by_age[x]['voted'] for x in age]
+            registered = [by_age[x]['registered'] for x in age]
+            overall_turnout = sum(voted) / sum(registered)
+            print(f'county {county_id} has {sum(registered)} registered voters')
+            if MINIMUM_TOTAL_VOTERS is not None and sum(registered) < MINIMUM_TOTAL_VOTERS:
+                continue
+            ii = range(len(registered))
+            key = [voted[i] / registered[i] / overall_turnout for i in ii]
+            if isolated_colors:
+                if county_id in isolated_colors:
+                    plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], 'r')
+                else:
+                    plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], 'b')
+            else:
+                plt.plot([age[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS], [key[i] for i in ii if registered[i] > MINIMUM_REGISTERED_VOTERS])
             counties_plotted += 1
         except:
             print(f'could not plot county_id {county_id}')
     print(f'plotted {counties_plotted} counties.')
-    plt.xlabel('Age')
-    plt.ylabel('Voter turnout (votes / registered voters)')
-    plt.title(f'Ohio Voter Turnout vs. Age ({counties_plotted} counties; each line = 1 county)')
+    if MINIMUM_TOTAL_VOTERS is not None:
+        print(f'skipped counties with less than {MINIMUM_TOTAL_VOTERS} voters.')
+    plt.xlabel(f'Age (ages with less than {MINIMUM_REGISTERED_VOTERS} registered voters are hidden)')
+    plt.ylabel('Normalized voter turnout (votes / registered voters / overall turnout fraction)')
+    plt.title(f'Ohio Voter Turnout vs. Age ({counties_plotted} of {len(filenames)} counties; each line = 1 county)')
+
     plt.show()
 
 
